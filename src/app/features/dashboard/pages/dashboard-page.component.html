@@ -1,0 +1,355 @@
+﻿<section class="dashboard-shell">
+  <section class="hero-card">
+    <div class="hero-content">
+      <p class="hero-eyebrow">Centre de pilotage SenClinic</p>
+      <h2>Tableau de bord clinique</h2>
+      <p class="hero-description">
+        Vue centralisee des activites medicales, de la capacite des equipes et du flux patient.
+      </p>
+
+      <div class="hero-tags">
+        <span>{{ todayLabel }}</span>
+        <span>{{ totalPatients() }} patients suivis</span>
+        <span>{{ medecinsActifs() }} medecins actifs</span>
+      </div>
+
+      <div class="hero-status-row">
+        <div class="hero-status-indicator">
+          <span></span>
+          Coordination active
+        </div>
+        <p>Flux patient surveille, capacite medicale consolidee et agenda synchronise.</p>
+      </div>
+    </div>
+
+    <div class="hero-side card-glass">
+      <div class="hero-side-head">
+        <div>
+          <p class="mini-title">Rythme de la semaine</p>
+          <p class="mini-value">{{ rdvSemaine() }} rendez-vous</p>
+        </div>
+        <span>{{ tauxRdvConfirmes() }}%</span>
+      </div>
+      <p class="mini-text">Planifies sur 7 jours glissants</p>
+
+      <div class="mini-progress-track">
+        <div class="mini-progress-fill" [style.width.%]="tauxRdvConfirmes()"></div>
+      </div>
+      <p class="mini-foot">{{ tauxRdvConfirmes() }}% de rendez-vous confirmes ou termines</p>
+
+      <div class="hero-side-metrics">
+        <div class="hero-side-metric">
+          <span>Aujourd'hui</span>
+          <strong>{{ rdvAujourdhui() }}</strong>
+        </div>
+        <div class="hero-side-metric">
+          <span>Medecins actifs</span>
+          <strong>{{ medecinsActifs() }}</strong>
+        </div>
+        <div class="hero-side-metric">
+          <span>Consultations</span>
+          <strong>{{ consultationsCount() }}</strong>
+        </div>
+      </div>
+
+      <button class="btn btn-secondary" type="button" (click)="loadDashboard()">Actualiser les donnees</button>
+    </div>
+  </section>
+
+  @if (loading()) {
+    <div class="loading-line"></div>
+  }
+
+  @if (errorMessage()) {
+    <div class="alert error">{{ errorMessage() }}</div>
+  }
+
+  <section class="pulse-grid">
+    <article class="pulse-card">
+      <p>Capacite active</p>
+      <strong>{{ occupationMedicale() }}%</strong>
+      <span>Pression globale du systeme de soins</span>
+    </article>
+    <article class="pulse-card">
+      <p>Hospitalisations</p>
+      <strong>{{ patientsHospitalises() }}</strong>
+      <span>Patients sous suivi intensif</span>
+    </article>
+    <article class="pulse-card">
+      <p>Certificats emis</p>
+      <strong>{{ certificatsDelivres() }}</strong>
+      <span>Documents medicaux valides</span>
+    </article>
+  </section>
+
+  <section class="grid-cards dashboard-kpis">
+    <app-stat-card
+      title="Patients suivis"
+      [value]="totalPatients().toString()"
+      description="Actifs et hospitalises"
+      chip="Population"
+      [trend]="patientsHospitalises() + ' hospitalises actuellement'"
+      [progress]="occupationMedicale()"
+      tone="teal"
+    />
+
+    <app-stat-card
+      title="Corps medical"
+      [value]="totalMedecins().toString()"
+      description="Disponibles dans le reseau"
+      chip="Ressources"
+      [trend]="medecinsActifs() + ' medecins en service'"
+      [progress]="(medecinsActifs() / (totalMedecins() || 1)) * 100"
+      tone="blue"
+    />
+
+    <app-stat-card
+      title="Rendez-vous du jour"
+      [value]="rdvAujourdhui().toString()"
+      description="Agenda de la journee"
+      chip="Operations"
+      [trend]="tauxRdvConfirmes() + '% de confirmations globales'"
+      [progress]="tauxRdvConfirmes()"
+      tone="gray"
+    />
+
+    <app-stat-card
+      title="Consultations"
+      [value]="consultationsCount().toString()"
+      description="Historique clinique"
+      chip="Suivi"
+      [trend]="certificatsDelivres() + ' certificats delivres'"
+      [progress]="(certificatsDelivres() / (consultationsCount() || 1)) * 100"
+      tone="teal"
+    />
+  </section>
+
+  <section class="insights-grid top-insights">
+    <article class="card alert-card">
+      <div class="section-head">
+        <div>
+          <h3>Alertes prioritaires</h3>
+          <p class="subtitle">Signaux rapides pour la coordination clinique.</p>
+        </div>
+      </div>
+
+      <div class="alerts-list">
+        @for (alerte of alertesPrioritaires(); track alerte.titre) {
+          <div class="alert-line" [class]="'alert-line ' + alerte.niveau">
+            <p>{{ alerte.titre }}</p>
+            <span>{{ alerte.detail }}</span>
+          </div>
+        }
+      </div>
+    </article>
+
+    <article class="card quick-actions-card">
+      <div class="section-head">
+        <div>
+          <h3>Actions rapides</h3>
+          <p class="subtitle">Acces direct aux operations frequentes.</p>
+        </div>
+      </div>
+
+      <div class="quick-actions-grid">
+        @for (action of quickActions; track action.path) {
+          <a [routerLink]="action.path" class="quick-action-item">
+            <strong>{{ action.label }}</strong>
+            <span>{{ action.description }}</span>
+          </a>
+        }
+      </div>
+    </article>
+  </section>
+
+  <section class="insights-grid">
+    <article class="card insight-card">
+      <div class="insight-header">
+        <div>
+          <h3>Capacite medicale</h3>
+          <p>Charge moyenne et occupation globale des equipes.</p>
+        </div>
+        <p class="insight-number">{{ chargeMoyenneParMedecin() }}</p>
+      </div>
+
+      <div class="insight-metric-row">
+        <span>Charge moyenne par medecin actif</span>
+        <strong>{{ chargeMoyenneParMedecin() }} patients</strong>
+      </div>
+      <div class="insight-metric-row">
+        <span>Occupation medicale estimee</span>
+        <strong>{{ occupationMedicale() }}%</strong>
+      </div>
+
+      <div class="mini-progress-track soft">
+        <div class="mini-progress-fill" [style.width.%]="occupationMedicale()"></div>
+      </div>
+    </article>
+
+    <article class="card insight-card">
+      <div class="insight-header">
+        <div>
+          <h3>Distribution des rendez-vous</h3>
+          <p>Repartition des statuts pour optimiser la planification.</p>
+        </div>
+      </div>
+
+      <div class="status-list">
+        @for (statusItem of distributionRendezVous(); track statusItem.status) {
+          <div class="status-row">
+            <div class="status-row-title">
+              <span class="status-pill" [class]="'status-pill ' + statusItem.status">{{ statusItem.status }}</span>
+              <strong>{{ statusItem.count }}</strong>
+            </div>
+            <div class="mini-progress-track status">
+              <div class="mini-progress-fill" [style.width.%]="statusItem.percentage"></div>
+            </div>
+          </div>
+        }
+      </div>
+    </article>
+  </section>
+
+  <section class="insights-grid">
+    <article class="card profile-card">
+      <div class="section-head">
+        <div>
+          <h3>Profil patients</h3>
+          <p class="subtitle">Repartition de la population suivie.</p>
+        </div>
+      </div>
+
+      <div class="profile-layout">
+        <div class="donut" [style.background]="sexeDonutStyle()">
+          <div class="donut-center">
+            <strong>{{ totalPatients() }}</strong>
+            <span>Total</span>
+          </div>
+        </div>
+
+        <div class="legend-list">
+          <div class="legend-item blue">
+            <p>Hommes</p>
+            <strong>{{ patientsParSexe().hommes }} ({{ patientsParSexe().pctHommes }}%)</strong>
+          </div>
+          <div class="legend-item teal">
+            <p>Femmes</p>
+            <strong>{{ patientsParSexe().femmes }} ({{ patientsParSexe().pctFemmes }}%)</strong>
+          </div>
+          <div class="legend-item amber">
+            <p>Autre</p>
+            <strong>{{ patientsParSexe().autres }} ({{ patientsParSexe().pctAutres }}%)</strong>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="card top-medecins-card">
+      <div class="section-head">
+        <div>
+          <h3>Top medecins par charge</h3>
+          <p class="subtitle">Patients assignes par praticien actif.</p>
+        </div>
+      </div>
+
+      <div class="top-medecins-list">
+        @for (medecin of topMedecinsCharge(); track medecin.id) {
+          <div class="medecin-line">
+            <div class="medecin-line-head">
+              <p>{{ medecin.nom }}</p>
+              <span>{{ medecin.patients }} patients</span>
+            </div>
+            <small>{{ medecin.specialite }}</small>
+            <div class="mini-progress-track status">
+              <div class="mini-progress-fill" [style.width.%]="medecin.fill"></div>
+            </div>
+          </div>
+        }
+      </div>
+    </article>
+  </section>
+
+  <section class="insights-grid second">
+    <article class="card agenda-card">
+      <h3>Agenda du jour</h3>
+      <p class="subtitle">Rendez-vous prevus aujourd'hui, classes par heure.</p>
+
+      @if (agendaAujourdhui().length === 0) {
+        <div class="alert info">Aucun rendez-vous enregistre pour aujourd'hui.</div>
+      } @else {
+        <div class="timeline">
+          @for (item of agendaAujourdhui(); track item.id) {
+            <div class="timeline-item">
+              <p class="time">{{ item.heure_rdv }}</p>
+              <div>
+                <p class="person">{{ item.patientNom }}</p>
+                <p class="meta">{{ item.medecinNom }} · {{ item.motif }}</p>
+              </div>
+              <span class="status-pill" [class]="'status-pill ' + item.statut">{{ item.statut }}</span>
+            </div>
+          }
+        </div>
+      }
+    </article>
+
+    <article class="card upcoming-table">
+      <h3>Prochains rendez-vous</h3>
+      <p class="subtitle">Vision avancee des prochains passages en clinique.</p>
+
+      @if (prochainRendezVous().length === 0) {
+        <div class="alert info">Aucun rendez-vous programme pour le moment.</div>
+      } @else {
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Heure</th>
+                <th>Patient</th>
+                <th>Medecin</th>
+                <th>Motif</th>
+                <th>Statut</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of prochainRendezVous(); track item.id) {
+                <tr>
+                  <td>{{ item.date_rdv }}</td>
+                  <td>{{ item.heure_rdv }}</td>
+                  <td>{{ item.patientNom }}</td>
+                  <td>{{ item.medecinNom }}</td>
+                  <td>{{ item.motif }}</td>
+                  <td><span class="status-pill" [class]="'status-pill ' + item.statut">{{ item.statut }}</span></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </article>
+  </section>
+
+  <section class="card recent-consultations">
+    <h3>Dernieres consultations</h3>
+    <p class="subtitle">Activite clinique recente enregistree dans SenClinic.</p>
+
+    @if (dernieresConsultations().length === 0) {
+      <div class="alert info">Aucune consultation enregistree.</div>
+    } @else {
+      <div class="consultation-list">
+        @for (consultation of dernieresConsultations(); track consultation.id) {
+          <div class="consultation-item">
+            <p class="consultation-date">{{ consultation.date_consultation }}</p>
+            <div>
+              <p class="consultation-main">{{ consultation.patientNom }} · {{ consultation.medecinNom }}</p>
+              <p class="consultation-meta">{{ consultation.motif_consultation }} · {{ consultation.diagnostic }}</p>
+            </div>
+            @if (consultation.certificat) {
+              <span class="cert-badge">Certificat</span>
+            }
+          </div>
+        }
+      </div>
+    }
+  </section>
+</section>

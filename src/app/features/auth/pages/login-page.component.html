@@ -1,0 +1,49 @@
+<section class="login-shell">
+  <div class="login-card">
+    <div class="login-brand">
+      <div class="badge">SC</div>
+      <div>
+        <h1>SenClinic</h1>
+        <p>Gestion medicale des cliniques du Senegal</p>
+      </div>
+    </div>
+
+    <h2>Connexion</h2>
+    <p class="intro">Connectez-vous avec un compte de demonstration.</p>
+
+    @if (errorMessage) {
+      <div class="alert error">{{ errorMessage }}</div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" type="email" formControlName="email" placeholder="ex: admin@senclinic.sn" />
+        @if (form.controls.email.invalid && form.controls.email.touched) {
+          <p class="error">Veuillez entrer un email valide.</p>
+        }
+      </div>
+
+      <div class="field">
+        <label for="mot_de_passe">Mot de passe</label>
+        <input id="mot_de_passe" type="password" formControlName="mot_de_passe" placeholder="Votre mot de passe" />
+        @if (form.controls.mot_de_passe.invalid && form.controls.mot_de_passe.touched) {
+          <p class="error">Le mot de passe est obligatoire (6 caracteres minimum).</p>
+        }
+      </div>
+
+      <button class="btn btn-primary full" type="submit" [disabled]="loadingState">
+        {{ loadingState ? 'Connexion...' : 'Se connecter' }}
+      </button>
+    </form>
+
+    <div class="demo-list">
+      <p>Comptes de demo :</p>
+      @for (account of demoAccounts; track account.email) {
+        <button class="btn btn-ghost demo-btn" type="button" (click)="useDemoAccount(account.email, account.mot_de_passe)">
+          {{ account.role }} · {{ account.email }} / {{ account.mot_de_passe }}
+        </button>
+      }
+    </div>
+  </div>
+</section>

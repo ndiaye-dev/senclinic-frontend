@@ -1,1 +1,293 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --primary-color: #0f766e;
+  --secondary-color: #1d4ed8;
+  --background: #f1f5f9;
+  --surface: #ffffff;
+  --text-color: #0f172a;
+  --muted-text: #475569;
+  --danger: #b91c1c;
+  --danger-bg: #fee2e2;
+  --border-color: #dbe3ee;
+  --shadow-soft: 0 10px 25px rgba(15, 23, 42, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: 'Manrope', sans-serif;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(29, 78, 216, 0.08), transparent 40%),
+    radial-gradient(circle at 0% 100%, rgba(15, 118, 110, 0.08), transparent 45%),
+    var(--background);
+  color: var(--text-color);
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+  margin: 0;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.page-header h2 {
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+
+.page-header p {
+  color: var(--muted-text);
+  margin-top: 0.2rem;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow: var(--shadow-soft);
+  padding: 1rem;
+}
+
+.grid-cards {
+  display: grid;
+  gap: 0.85rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.btn {
+  border: none;
+  border-radius: 10px;
+  padding: 0.58rem 0.95rem;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: linear-gradient(90deg, var(--primary-color), #0d9488);
+  color: #fff;
+}
+
+.btn-secondary {
+  background: linear-gradient(90deg, var(--secondary-color), #2563eb);
+  color: #fff;
+}
+
+.btn-ghost {
+  border: 1px solid var(--border-color);
+  background: #fff;
+  color: var(--text-color);
+}
+
+.btn-danger {
+  background: #dc2626;
+  color: #fff;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.85rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.field label {
+  font-size: 0.85rem;
+  color: var(--muted-text);
+  font-weight: 600;
+}
+
+.field input,
+.field select,
+.field textarea {
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 0.92rem;
+  padding: 0.55rem 0.65rem;
+  background: #fff;
+}
+
+.field textarea {
+  min-height: 85px;
+  resize: vertical;
+}
+
+.field .error {
+  font-size: 0.78rem;
+  color: #dc2626;
+}
+
+.toolbar {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: 1fr 180px 180px;
+  margin-bottom: 0.9rem;
+}
+
+.toolbar .search {
+  width: 100%;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 0.72rem;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 0.88rem;
+  white-space: nowrap;
+}
+
+th {
+  color: var(--muted-text);
+  background: #f8fafc;
+  font-weight: 700;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.15rem 0.55rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.status-pill.actif,
+.status-pill.confirme,
+.status-pill.termine {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-pill.planifie,
+.status-pill.hospitalise,
+.status-pill.conge {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.status-pill.annule,
+.status-pill.inactif {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.alert {
+  border-radius: 12px;
+  padding: 0.7rem 0.8rem;
+  margin-bottom: 0.8rem;
+}
+
+.alert.error {
+  background: var(--danger-bg);
+  color: var(--danger);
+  border: 1px solid #fecaca;
+}
+
+.alert.info {
+  background: #eff6ff;
+  color: #1e40af;
+  border: 1px solid #bfdbfe;
+}
+
+.pagination {
+  margin-top: 0.8rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.pagination-controls {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.pagination-controls button {
+  border: 1px solid var(--border-color);
+  background: #fff;
+  border-radius: 8px;
+  padding: 0.4rem 0.62rem;
+  cursor: pointer;
+}
+
+.pagination-controls button.active {
+  background: var(--secondary-color);
+  color: #fff;
+  border-color: var(--secondary-color);
+}
+
+.loading-line {
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  animation: loading 1.2s ease-in-out infinite;
+  margin-bottom: 0.9rem;
+}
+
+@keyframes loading {
+  0% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.35;
+  }
+}
+
+@media (max-width: 900px) {
+  .toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

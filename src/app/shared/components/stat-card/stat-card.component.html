@@ -1,0 +1,20 @@
+<article class="stat-card" [class]="'stat-card ' + tone()">
+  <div class="stat-head">
+    <p class="stat-title">{{ title() }}</p>
+    @if (chip()) {
+      <span class="stat-chip">{{ chip() }}</span>
+    }
+  </div>
+  <p class="stat-value">{{ value() }}</p>
+  @if (description()) {
+    <p class="stat-description">{{ description() }}</p>
+  }
+  @if (trend()) {
+    <p class="stat-trend">{{ trend() }}</p>
+  }
+  @if (progressValue() !== null) {
+    <div class="progress-track">
+      <div class="progress-fill" [style.width.%]="progressValue()"></div>
+    </div>
+  }
+</article>

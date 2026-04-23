@@ -1,0 +1,214 @@
+<section>
+  <div class="page-header">
+    <div>
+      <h2>Patients</h2>
+      <p>Dossiers patients, informations administratives et medicales.</p>
+    </div>
+    <button class="btn btn-primary" type="button" (click)="openCreateForm()">Nouveau patient</button>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-line"></div>
+  }
+
+  @if (errorMessage()) {
+    <div class="alert error">{{ errorMessage() }}</div>
+  }
+
+  @if (showForm()) {
+    <section class="card form-card">
+      <h3>{{ editingId() ? 'Modifier un patient' : 'Ajouter un patient' }}</h3>
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="form-grid">
+          <div class="field">
+            <label for="numero_dossier">Numero dossier</label>
+            <input id="numero_dossier" formControlName="numero_dossier" />
+            @if (form.controls.numero_dossier.invalid && form.controls.numero_dossier.touched) {
+              <p class="error">Champ obligatoire.</p>
+            }
+          </div>
+
+          <div class="field">
+            <label for="nom">Nom</label>
+            <input id="nom" formControlName="nom" />
+          </div>
+
+          <div class="field">
+            <label for="prenom">Prenom</label>
+            <input id="prenom" formControlName="prenom" />
+          </div>
+
+          <div class="field">
+            <label for="date_naissance">Date naissance</label>
+            <input id="date_naissance" type="date" formControlName="date_naissance" />
+          </div>
+
+          <div class="field">
+            <label for="sexe">Sexe</label>
+            <select id="sexe" formControlName="sexe">
+              <option value="Homme">Homme</option>
+              <option value="Femme">Femme</option>
+              <option value="Autre">Autre</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="groupe_sanguin">Groupe sanguin</label>
+            <select id="groupe_sanguin" formControlName="groupe_sanguin">
+              <option value="O+">O+</option>
+              <option value="O-">O-</option>
+              <option value="A+">A+</option>
+              <option value="A-">A-</option>
+              <option value="B+">B+</option>
+              <option value="B-">B-</option>
+              <option value="AB+">AB+</option>
+              <option value="AB-">AB-</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="poids">Poids (kg)</label>
+            <input id="poids" type="number" formControlName="poids" />
+          </div>
+
+          <div class="field">
+            <label for="telephone">Telephone</label>
+            <input id="telephone" formControlName="telephone" />
+          </div>
+
+          <div class="field">
+            <label for="adresse">Adresse</label>
+            <input id="adresse" formControlName="adresse" />
+          </div>
+
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" formControlName="email" type="email" />
+          </div>
+
+          <div class="field">
+            <label for="numero_securite_sociale">Numero securite sociale</label>
+            <input id="numero_securite_sociale" formControlName="numero_securite_sociale" />
+          </div>
+
+          <div class="field">
+            <label for="medecin_traitant">Medecin traitant</label>
+            <select id="medecin_traitant" formControlName="medecin_traitant">
+              @for (medecin of medecins(); track medecin.id) {
+                <option [ngValue]="medecin.id">Dr {{ medecin.prenom }} {{ medecin.nom }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="statut">Statut</label>
+            <select id="statut" formControlName="statut">
+              <option value="actif">Actif</option>
+              <option value="hospitalise">Hospitalise</option>
+              <option value="inactif">Inactif</option>
+            </select>
+          </div>
+
+          <div class="field full-width">
+            <label for="allergies">Allergies</label>
+            <textarea id="allergies" formControlName="allergies"></textarea>
+          </div>
+
+          <div class="field full-width">
+            <label for="antecedents_medicaux">Antecedents medicaux</label>
+            <textarea id="antecedents_medicaux" formControlName="antecedents_medicaux"></textarea>
+          </div>
+
+          <div class="field full-width">
+            <label for="traitements_cours">Traitements en cours</label>
+            <textarea id="traitements_cours" formControlName="traitements_cours"></textarea>
+          </div>
+        </div>
+
+        <div class="actions-row">
+          <button class="btn btn-secondary" type="submit" [disabled]="saving()">
+            {{ saving() ? 'Sauvegarde...' : 'Enregistrer' }}
+          </button>
+          <button class="btn btn-ghost" type="button" (click)="cancelForm()">Annuler</button>
+        </div>
+      </form>
+    </section>
+  }
+
+  <section class="card">
+    <div class="toolbar patients-toolbar">
+      <input
+        class="search"
+        type="search"
+        placeholder="Rechercher dossier, nom, prenom ou telephone"
+        (input)="onSearchChange($any($event.target).value)"
+      />
+      <select (change)="onSexeFilter($any($event.target).value)">
+        <option value="tous">Tous sexes</option>
+        <option value="Homme">Homme</option>
+        <option value="Femme">Femme</option>
+        <option value="Autre">Autre</option>
+      </select>
+      <select (change)="onStatutFilter($any($event.target).value)">
+        <option value="tous">Tous statuts</option>
+        <option value="actif">Actif</option>
+        <option value="hospitalise">Hospitalise</option>
+        <option value="inactif">Inactif</option>
+      </select>
+      <button class="btn btn-ghost" type="button" (click)="loadData()">Recharger</button>
+    </div>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Dossier</th>
+            <th>Nom complet</th>
+            <th>Date naissance</th>
+            <th>Telephone</th>
+            <th>Medecin traitant</th>
+            <th>Statut</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (paginatedPatients().length === 0) {
+            <tr>
+              <td colspan="7">Aucun patient correspondant.</td>
+            </tr>
+          } @else {
+            @for (patient of paginatedPatients(); track patient.id) {
+              <tr>
+                <td>{{ patient.numero_dossier }}</td>
+                <td>{{ patient.prenom }} {{ patient.nom }}</td>
+                <td>{{ patient.date_naissance }}</td>
+                <td>{{ patient.telephone }}</td>
+                <td>{{ getMedecinNom(patient.medecin_traitant) }}</td>
+                <td>
+                  <span class="status-pill" [class]="'status-pill ' + patient.statut">{{ patient.statut }}</span>
+                </td>
+                <td>
+                  <div class="actions">
+                    <button class="btn btn-ghost" type="button" (click)="openEditForm(patient)">Modifier</button>
+                    <button class="btn btn-danger" type="button" (click)="deletePatient(patient.id)">Supprimer</button>
+                  </div>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination">
+      <p>Page {{ currentPage() }} / {{ totalPages() }} ({{ filteredPatients().length }} resultats)</p>
+      <div class="pagination-controls">
+        <button type="button" (click)="goToPage(currentPage() - 1)">Precedent</button>
+        @for (page of pageNumbers(); track page) {
+          <button type="button" [class.active]="page === currentPage()" (click)="goToPage(page)">{{ page }}</button>
+        }
+        <button type="button" (click)="goToPage(currentPage() + 1)">Suivant</button>
+      </div>
+    </div>
+  </section>
+</section>

@@ -1,0 +1,159 @@
+<section>
+  <div class="page-header">
+    <div>
+      <h2>Medecins</h2>
+      <p>Gestion des profils medecins et statuts d'activite.</p>
+    </div>
+    <button class="btn btn-primary" type="button" (click)="openCreateForm()">Nouveau medecin</button>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-line"></div>
+  }
+
+  @if (errorMessage()) {
+    <div class="alert error">{{ errorMessage() }}</div>
+  }
+
+  @if (showForm()) {
+    <section class="card form-card">
+      <h3>{{ editingId() ? 'Modifier un medecin' : 'Ajouter un medecin' }}</h3>
+      <form [formGroup]="form" (ngSubmit)="submit()" class="form-grid" novalidate>
+        <div class="field">
+          <label for="numero_ordre">Numero d'ordre</label>
+          <input id="numero_ordre" formControlName="numero_ordre" />
+          @if (form.controls.numero_ordre.invalid && form.controls.numero_ordre.touched) {
+            <p class="error">Numero obligatoire.</p>
+          }
+        </div>
+
+        <div class="field">
+          <label for="nom">Nom</label>
+          <input id="nom" formControlName="nom" />
+          @if (form.controls.nom.invalid && form.controls.nom.touched) {
+            <p class="error">Nom obligatoire.</p>
+          }
+        </div>
+
+        <div class="field">
+          <label for="prenom">Prenom</label>
+          <input id="prenom" formControlName="prenom" />
+          @if (form.controls.prenom.invalid && form.controls.prenom.touched) {
+            <p class="error">Prenom obligatoire.</p>
+          }
+        </div>
+
+        <div class="field">
+          <label for="specialite">Specialite</label>
+          <input id="specialite" formControlName="specialite" />
+          @if (form.controls.specialite.invalid && form.controls.specialite.touched) {
+            <p class="error">Specialite obligatoire.</p>
+          }
+        </div>
+
+        <div class="field">
+          <label for="telephone">Telephone</label>
+          <input id="telephone" formControlName="telephone" />
+          @if (form.controls.telephone.invalid && form.controls.telephone.touched) {
+            <p class="error">Telephone invalide.</p>
+          }
+        </div>
+
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" formControlName="email" type="email" />
+          @if (form.controls.email.invalid && form.controls.email.touched) {
+            <p class="error">Email valide obligatoire.</p>
+          }
+        </div>
+
+        <div class="field">
+          <label for="statut">Statut</label>
+          <select id="statut" formControlName="statut">
+            <option value="actif">Actif</option>
+            <option value="conge">Conge</option>
+            <option value="inactif">Inactif</option>
+          </select>
+        </div>
+
+        <div class="actions-row">
+          <button class="btn btn-secondary" type="submit" [disabled]="saving()">
+            {{ saving() ? 'Sauvegarde...' : 'Enregistrer' }}
+          </button>
+          <button class="btn btn-ghost" type="button" (click)="cancelForm()">Annuler</button>
+        </div>
+      </form>
+    </section>
+  }
+
+  <section class="card">
+    <div class="toolbar">
+      <input
+        class="search"
+        type="search"
+        placeholder="Rechercher par nom, specialite, numero d'ordre..."
+        (input)="onSearchChange($any($event.target).value)"
+      />
+      <select (change)="onFilterChange($any($event.target).value)">
+        <option value="tous">Tous statuts</option>
+        <option value="actif">Actif</option>
+        <option value="conge">Conge</option>
+        <option value="inactif">Inactif</option>
+      </select>
+      <button class="btn btn-ghost" type="button" (click)="loadMedecins()">Recharger</button>
+    </div>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Numero ordre</th>
+            <th>Nom complet</th>
+            <th>Specialite</th>
+            <th>Telephone</th>
+            <th>Email</th>
+            <th>Statut</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (paginatedMedecins().length === 0) {
+            <tr>
+              <td colspan="7">Aucun medecin trouve.</td>
+            </tr>
+          } @else {
+            @for (medecin of paginatedMedecins(); track medecin.id) {
+              <tr>
+                <td>{{ medecin.numero_ordre }}</td>
+                <td>{{ medecin.prenom }} {{ medecin.nom }}</td>
+                <td>{{ medecin.specialite }}</td>
+                <td>{{ medecin.telephone }}</td>
+                <td>{{ medecin.email }}</td>
+                <td>
+                  <span class="status-pill" [class]="'status-pill ' + medecin.statut">{{ medecin.statut }}</span>
+                </td>
+                <td>
+                  <div class="actions">
+                    <button class="btn btn-ghost" type="button" (click)="openEditForm(medecin)">Modifier</button>
+                    <button class="btn btn-danger" type="button" (click)="deleteMedecin(medecin.id)">Supprimer</button>
+                  </div>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination">
+      <p>Page {{ currentPage() }} / {{ totalPages() }} ({{ filteredMedecins().length }} resultats)</p>
+      <div class="pagination-controls">
+        <button type="button" (click)="goToPage(currentPage() - 1)">Precedent</button>
+        @for (page of pageNumbers(); track page) {
+          <button type="button" [class.active]="page === currentPage()" (click)="goToPage(page)">{{ page }}</button>
+        }
+        <button type="button" (click)="goToPage(currentPage() + 1)">Suivant</button>
+      </div>
+    </div>
+  </section>
+</section>

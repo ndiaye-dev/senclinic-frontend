@@ -1,0 +1,147 @@
+<section>
+  <div class="page-header">
+    <div>
+      <h2>Gestion Utilisateurs</h2>
+      <p>Administration des comptes de l'application SenClinic.</p>
+    </div>
+    <button class="btn btn-primary" type="button" (click)="openCreateForm()">Nouvel utilisateur</button>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-line"></div>
+  }
+
+  @if (errorMessage()) {
+    <div class="alert error">{{ errorMessage() }}</div>
+  }
+
+  @if (showForm()) {
+    <section class="card form-card">
+      <h3>{{ editingId() ? 'Modifier un utilisateur' : 'Ajouter un utilisateur' }}</h3>
+      <form [formGroup]="form" (ngSubmit)="submit()" class="form-grid" novalidate>
+        <div class="field">
+          <label for="nom">Nom</label>
+          <input id="nom" formControlName="nom" />
+        </div>
+
+        <div class="field">
+          <label for="prenom">Prenom</label>
+          <input id="prenom" formControlName="prenom" />
+        </div>
+
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" formControlName="email" type="email" />
+        </div>
+
+        <div class="field">
+          <label for="role">Role</label>
+          <select id="role" formControlName="role">
+            <option value="administrateur">Administrateur</option>
+            <option value="medecin">Medecin</option>
+            <option value="secretaire">Secretaire</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="telephone">Telephone</label>
+          <input id="telephone" formControlName="telephone" />
+        </div>
+
+        <div class="field">
+          <label for="statut">Statut</label>
+          <select id="statut" formControlName="statut">
+            <option value="actif">Actif</option>
+            <option value="inactif">Inactif</option>
+          </select>
+        </div>
+
+        <div class="field full-width">
+          <label for="mot_de_passe">Mot de passe</label>
+          <input id="mot_de_passe" type="text" formControlName="mot_de_passe" />
+        </div>
+
+        <div class="actions-row full-width">
+          <button class="btn btn-secondary" type="submit" [disabled]="saving()">
+            {{ saving() ? 'Sauvegarde...' : 'Enregistrer' }}
+          </button>
+          <button class="btn btn-ghost" type="button" (click)="cancelForm()">Annuler</button>
+        </div>
+      </form>
+    </section>
+  }
+
+  <section class="card">
+    <div class="toolbar users-toolbar">
+      <input
+        class="search"
+        type="search"
+        placeholder="Rechercher par nom, prenom ou email"
+        (input)="onSearchChange($any($event.target).value)"
+      />
+      <select (change)="onRoleFilter($any($event.target).value)">
+        <option value="tous">Tous roles</option>
+        <option value="administrateur">Administrateur</option>
+        <option value="medecin">Medecin</option>
+        <option value="secretaire">Secretaire</option>
+      </select>
+      <select (change)="onStatutFilter($any($event.target).value)">
+        <option value="tous">Tous statuts</option>
+        <option value="actif">Actif</option>
+        <option value="inactif">Inactif</option>
+      </select>
+      <button class="btn btn-ghost" type="button" (click)="loadUsers()">Recharger</button>
+    </div>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Nom complet</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Telephone</th>
+            <th>Statut</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (paginatedUtilisateurs().length === 0) {
+            <tr>
+              <td colspan="6">Aucun utilisateur trouve.</td>
+            </tr>
+          } @else {
+            @for (user of paginatedUtilisateurs(); track user.id) {
+              <tr>
+                <td>{{ user.prenom }} {{ user.nom }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.role }}</td>
+                <td>{{ user.telephone }}</td>
+                <td>
+                  <span class="status-pill" [class]="'status-pill ' + user.statut">{{ user.statut }}</span>
+                </td>
+                <td>
+                  <div class="actions">
+                    <button class="btn btn-ghost" type="button" (click)="openEditForm(user)">Modifier</button>
+                    <button class="btn btn-danger" type="button" (click)="deleteUser(user.id)">Supprimer</button>
+                  </div>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination">
+      <p>Page {{ currentPage() }} / {{ totalPages() }} ({{ filteredUtilisateurs().length }} resultats)</p>
+      <div class="pagination-controls">
+        <button type="button" (click)="goToPage(currentPage() - 1)">Precedent</button>
+        @for (page of pageNumbers(); track page) {
+          <button type="button" [class.active]="page === currentPage()" (click)="goToPage(page)">{{ page }}</button>
+        }
+        <button type="button" (click)="goToPage(currentPage() + 1)">Suivant</button>
+      </div>
+    </div>
+  </section>
+</section>

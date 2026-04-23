@@ -1,59 +1,101 @@
-# SenclinicFrontend
+# SenClinic Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.0.3.
+Application frontend Angular de gestion medicale multi-cliniques pour le Senegal.
 
-## Development server
+## Apercu
 
-To start a local development server, run:
+- Nom UI: **SenClinic**
+- Langue: **francais**
+- Stack: **Angular 21+, standalone components, routing lazy-loaded, TypeScript strict**
+- Architecture: **core / shared / features**
+- Authentification: **mock locale (sans backend)** avec roles:
+  - `administrateur`
+  - `medecin`
+  - `secretaire`
 
-```bash
-ng serve
-```
+## Fonctionnalites incluses
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+- Login avec roles + session locale
+- Guards:
+  - `auth guard`
+  - `role guard`
+- Layout principal responsive:
+  - Sidebar
+  - Header
+- Pages metier:
+  - Tableau de bord
+  - Patients (CRUD + recherche + filtres + pagination)
+  - Rendez-vous (CRUD + recherche + filtres + pagination)
+  - Consultations (CRUD + recherche + filtres + pagination)
+  - Medecins (CRUD + recherche + filtres + pagination)
+  - Gestion Utilisateurs (CRUD + recherche + filtres + pagination)
+- Services mock locaux avec donnees de demonstration Senegal
+- Formulaires reactive forms avec validations
+- Etats UI de chargement et erreurs
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+## Installation
 
 ```bash
-ng test
+npm install
 ```
 
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
+## Lancement local
 
 ```bash
-ng e2e
+npm start
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+Application disponible sur `http://localhost:4200`.
 
-## Additional Resources
+## Build production
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+```bash
+npm run build
+```
+
+Build genere dans `dist/senclinic-frontend`.
+
+## Comptes de demonstration
+
+- `admin@senclinic.sn / admin123`
+- `medecin@senclinic.sn / medecin123`
+- `secretaire@senclinic.sn / secretaire123`
+
+## Deploiement sur Vercel (pas a pas)
+
+1. Pousser le projet sur GitHub/GitLab/Bitbucket.
+2. Se connecter a Vercel et cliquer sur **Add New Project**.
+3. Importer le repository `senclinic-frontend`.
+4. Verifier les parametres:
+   - Build Command: `npm run build`
+   - Output Directory: `dist/senclinic-frontend`
+5. Lancer le deploiement.
+6. Vercel utilisera `vercel.json` pour la redirection SPA vers `index.html`.
+
+## Structure principale
+
+```text
+src/app
+  core/
+    data/
+    guards/
+    layout/
+    models/
+    services/
+  shared/
+    components/
+  features/
+    auth/
+    dashboard/
+    medecins/
+    patients/
+    rendez-vous/
+    consultations/
+    utilisateurs/
+```
+
+## Notes techniques
+
+- Les champs metier suivent strictement la convention `snake_case` dans les modeles TypeScript.
+- `patient_id` et `medecin_id` sont geres comme relations par identifiants dans les formulaires et les listes.
+- Aucune API backend n'est requise pour ce prototype: tout passe par des services Angular mockes.

@@ -1,0 +1,63 @@
+<div class="layout-shell">
+  <aside class="sidebar" [class.open]="sidebarOpen()">
+    <div class="sidebar-brand">
+      <div class="brand-badge">SC</div>
+      <div>
+        <h1>SenClinic</h1>
+        <p>Gestion medicale</p>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      @for (item of visibleMenuItems(); track item.path) {
+        <a
+          [routerLink]="item.path"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          (click)="closeSidebar()"
+        >
+          {{ item.label }}
+        </a>
+      }
+    </nav>
+  </aside>
+
+  <div class="overlay" [class.show]="sidebarOpen()" (click)="closeSidebar()"></div>
+
+  <section class="main-content">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="mobile-menu-btn" type="button" (click)="toggleSidebar()">Menu</button>
+        <div class="topbar-brand">
+          <div class="topbar-brand-badge">SC</div>
+          <div>
+            <p class="topbar-title">SenClinic</p>
+            <p class="topbar-subtitle">Plateforme clinique nationale <span class="live-badge">En ligne</span></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="topbar-center">
+        <p class="context-pill">Centre de coordination clinique</p>
+        <p class="context-meta">
+          <span>{{ displayDate() }}</span>
+          <i></i>
+          <span>{{ displayTime() }}</span>
+        </p>
+      </div>
+
+      <div class="topbar-user-card">
+        <div class="user-avatar">{{ userInitials() }}</div>
+        <div class="user-meta">
+          <p>{{ currentUser()?.prenom }} {{ currentUser()?.nom }}</p>
+          <span class="user-role">{{ roleLabel() }}</span>
+        </div>
+        <button class="btn btn-ghost topbar-logout" type="button" (click)="logout()">Deconnexion</button>
+      </div>
+    </header>
+
+    <main class="page-container">
+      <router-outlet></router-outlet>
+    </main>
+  </section>
+</div>

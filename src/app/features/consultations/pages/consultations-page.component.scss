@@ -1,0 +1,25 @@
+.form-card {
+  margin-bottom: 1rem;
+}
+
+.form-card h3 {
+  margin-bottom: 0.9rem;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+.checkbox-row {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.2rem;
+}
+
+.actions-row {
+  display: flex;
+  gap: 0.55rem;
+  margin-top: 0.8rem;
+}

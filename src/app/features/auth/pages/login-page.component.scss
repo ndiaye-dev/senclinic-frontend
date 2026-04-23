@@ -1,0 +1,74 @@
+.login-shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background:
+    radial-gradient(circle at 10% 20%, rgba(15, 118, 110, 0.18), transparent 45%),
+    radial-gradient(circle at 90% 85%, rgba(29, 78, 216, 0.2), transparent 45%),
+    #f8fafc;
+}
+
+.login-card {
+  width: min(560px, 100%);
+  border-radius: 22px;
+  border: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: var(--shadow-soft);
+  padding: 1.4rem;
+}
+
+.login-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.badge {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+}
+
+.login-brand h1 {
+  font-size: 1.4rem;
+}
+
+.login-brand p,
+.intro {
+  color: var(--muted-text);
+}
+
+form {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.full {
+  width: 100%;
+  margin-top: 0.2rem;
+}
+
+.demo-list {
+  margin-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 0.9rem;
+}
+
+.demo-list p {
+  margin-bottom: 0.6rem;
+  font-size: 0.88rem;
+  color: var(--muted-text);
+}
+
+.demo-btn {
+  width: 100%;
+  text-align: left;
+  margin-bottom: 0.5rem;
+}

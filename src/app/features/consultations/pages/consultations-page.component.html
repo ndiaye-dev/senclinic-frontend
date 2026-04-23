@@ -1,0 +1,154 @@
+<section>
+  <div class="page-header">
+    <div>
+      <h2>Consultations</h2>
+      <p>Historique clinique avec diagnostics, observations et ordonnances.</p>
+    </div>
+    <button class="btn btn-primary" type="button" (click)="openCreateForm()">Nouvelle consultation</button>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-line"></div>
+  }
+
+  @if (errorMessage()) {
+    <div class="alert error">{{ errorMessage() }}</div>
+  }
+
+  @if (showForm()) {
+    <section class="card form-card">
+      <h3>{{ editingId() ? 'Modifier la consultation' : 'Ajouter une consultation' }}</h3>
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="form-grid">
+          <div class="field">
+            <label for="patient_id">Patient</label>
+            <select id="patient_id" formControlName="patient_id">
+              @for (patient of patients(); track patient.id) {
+                <option [ngValue]="patient.id">{{ patient.prenom }} {{ patient.nom }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="medecin_id">Medecin</label>
+            <select id="medecin_id" formControlName="medecin_id">
+              @for (medecin of medecins(); track medecin.id) {
+                <option [ngValue]="medecin.id">Dr {{ medecin.prenom }} {{ medecin.nom }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="date_consultation">Date consultation</label>
+            <input id="date_consultation" type="date" formControlName="date_consultation" />
+          </div>
+
+          <div class="field full-width">
+            <label for="motif_consultation">Motif consultation</label>
+            <textarea id="motif_consultation" formControlName="motif_consultation"></textarea>
+          </div>
+
+          <div class="field full-width">
+            <label for="symptomes">Symptomes</label>
+            <textarea id="symptomes" formControlName="symptomes"></textarea>
+          </div>
+
+          <div class="field full-width">
+            <label for="diagnostic">Diagnostic</label>
+            <textarea id="diagnostic" formControlName="diagnostic"></textarea>
+          </div>
+
+          <div class="field full-width">
+            <label for="observations">Observations</label>
+            <textarea id="observations" formControlName="observations"></textarea>
+          </div>
+
+          <div class="field full-width">
+            <label for="ordonnance">Ordonnance</label>
+            <textarea id="ordonnance" formControlName="ordonnance"></textarea>
+          </div>
+
+          <div class="checkbox-row">
+            <input id="certificat" type="checkbox" formControlName="certificat" />
+            <label for="certificat">Certificat medical delivre</label>
+          </div>
+        </div>
+
+        <div class="actions-row">
+          <button class="btn btn-secondary" type="submit" [disabled]="saving()">
+            {{ saving() ? 'Sauvegarde...' : 'Enregistrer' }}
+          </button>
+          <button class="btn btn-ghost" type="button" (click)="cancelForm()">Annuler</button>
+        </div>
+      </form>
+    </section>
+  }
+
+  <section class="card">
+    <div class="toolbar">
+      <input
+        class="search"
+        type="search"
+        placeholder="Rechercher par motif, diagnostic, patient ou medecin"
+        (input)="onSearchChange($any($event.target).value)"
+      />
+      <select (change)="onCertificatFilter($any($event.target).value)">
+        <option value="tous">Tous certificats</option>
+        <option value="avec">Avec certificat</option>
+        <option value="sans">Sans certificat</option>
+      </select>
+      <button class="btn btn-ghost" type="button" (click)="loadData()">Recharger</button>
+    </div>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Patient</th>
+            <th>Medecin</th>
+            <th>Motif</th>
+            <th>Diagnostic</th>
+            <th>Certificat</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (paginatedConsultations().length === 0) {
+            <tr>
+              <td colspan="7">Aucune consultation trouvee.</td>
+            </tr>
+          } @else {
+            @for (consultation of paginatedConsultations(); track consultation.id) {
+              <tr>
+                <td>{{ consultation.date_consultation }}</td>
+                <td>{{ getPatientNom(consultation.patient_id) }}</td>
+                <td>{{ getMedecinNom(consultation.medecin_id) }}</td>
+                <td>{{ consultation.motif_consultation }}</td>
+                <td>{{ consultation.diagnostic }}</td>
+                <td>{{ consultation.certificat ? 'Oui' : 'Non' }}</td>
+                <td>
+                  <div class="actions">
+                    <button class="btn btn-ghost" type="button" (click)="openEditForm(consultation)">Modifier</button>
+                    <button class="btn btn-danger" type="button" (click)="deleteConsultation(consultation.id)">Supprimer</button>
+                  </div>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination">
+      <p>Page {{ currentPage() }} / {{ totalPages() }} ({{ filteredConsultations().length }} resultats)</p>
+      <div class="pagination-controls">
+        <button type="button" (click)="goToPage(currentPage() - 1)">Precedent</button>
+        @for (page of pageNumbers(); track page) {
+          <button type="button" [class.active]="page === currentPage()" (click)="goToPage(page)">{{ page }}</button>
+        }
+        <button type="button" (click)="goToPage(currentPage() + 1)">Suivant</button>
+      </div>
+    </div>
+  </section>
+</section>

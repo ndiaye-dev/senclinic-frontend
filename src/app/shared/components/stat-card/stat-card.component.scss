@@ -1,0 +1,90 @@
+.stat-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 18px;
+  border: 1px solid var(--border-color);
+  background: linear-gradient(180deg, #fff 0%, #f8fafc 100%);
+  padding: 1rem 1.1rem;
+  box-shadow: var(--shadow-soft);
+}
+
+.stat-card.teal {
+  border-top: 4px solid var(--primary-color);
+}
+
+.stat-card.blue {
+  border-top: 4px solid var(--secondary-color);
+}
+
+.stat-card.gray {
+  border-top: 4px solid #94a3b8;
+}
+
+.stat-card::after {
+  content: '';
+  position: absolute;
+  right: -35px;
+  top: -35px;
+  width: 95px;
+  height: 95px;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.04);
+}
+
+.stat-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.stat-title {
+  margin: 0;
+  color: var(--muted-text);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.stat-chip {
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.18rem 0.5rem;
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.stat-value {
+  margin: 0.42rem 0 0.35rem;
+  color: var(--text-color);
+  font-size: 1.82rem;
+  line-height: 1;
+  font-weight: 800;
+}
+
+.stat-description {
+  margin: 0;
+  color: var(--muted-text);
+  font-size: 0.85rem;
+}
+
+.stat-trend {
+  margin: 0.45rem 0 0;
+  font-size: 0.8rem;
+  color: #0f766e;
+  font-weight: 700;
+}
+
+.progress-track {
+  margin-top: 0.52rem;
+  height: 7px;
+  border-radius: 999px;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+}
