@@ -25,6 +25,7 @@ export class MainLayoutComponent {
   readonly sidebarOpen = signal(false);
   readonly currentUser = this.authService.currentUser;
   readonly now = signal(new Date());
+  readonly globalSearch = signal('');
 
   readonly displayDate = computed(() =>
     new Intl.DateTimeFormat('fr-FR', {
@@ -103,6 +104,43 @@ export class MainLayoutComponent {
 
   closeSidebar(): void {
     this.sidebarOpen.set(false);
+  }
+
+  updateGlobalSearch(value: string): void {
+    this.globalSearch.set(value);
+  }
+
+  goToSearchTarget(event: Event): void {
+    event.preventDefault();
+
+    const search = this.globalSearch().trim().toLowerCase();
+
+    if (search.includes('rdv') || search.includes('rendez')) {
+      this.router.navigate(['/rendez-vous']);
+      return;
+    }
+
+    if (search.includes('consult')) {
+      this.router.navigate(['/consultations']);
+      return;
+    }
+
+    if (search.includes('medec')) {
+      this.router.navigate(['/medecins']);
+      return;
+    }
+
+    if (search.includes('utilisateur') || search.includes('user')) {
+      this.router.navigate(['/utilisateurs']);
+      return;
+    }
+
+    if (search.includes('tableau') || search.includes('dashboard')) {
+      this.router.navigate(['/tableau-de-bord']);
+      return;
+    }
+
+    this.router.navigate(['/patients']);
   }
 
   logout(): void {

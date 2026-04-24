@@ -25,36 +25,57 @@
   <div class="overlay" [class.show]="sidebarOpen()" (click)="closeSidebar()"></div>
 
   <section class="main-content">
-    <header class="topbar">
-      <div class="topbar-left">
-        <button class="mobile-menu-btn" type="button" (click)="toggleSidebar()">Menu</button>
-        <div class="topbar-brand">
-          <div class="topbar-brand-badge">SC</div>
-          <div>
-            <p class="topbar-title">SenClinic</p>
-            <p class="topbar-subtitle">Plateforme clinique nationale <span class="live-badge">En ligne</span></p>
+    <div class="topbar-shell">
+      <div class="utility-bar">
+        <form class="global-search" (submit)="goToSearchTarget($event)">
+          <span class="search-mark" aria-hidden="true"></span>
+          <input
+            type="search"
+            placeholder="Rechercher patient, medecin, rendez-vous..."
+            aria-label="Recherche globale"
+            [value]="globalSearch()"
+            (input)="updateGlobalSearch($any($event.target).value)"
+          />
+          <button type="submit">Rechercher</button>
+        </form>
+
+        <div class="utility-highlights">
+          <span>Coordination nationale</span>
+          <span>Dakar, Senegal</span>
+        </div>
+      </div>
+
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-menu-btn" type="button" (click)="toggleSidebar()">Menu</button>
+          <div class="topbar-brand">
+            <div class="topbar-brand-badge">SC</div>
+            <div>
+              <p class="topbar-title">SenClinic</p>
+              <p class="topbar-subtitle">Plateforme clinique nationale <span class="live-badge">En ligne</span></p>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="topbar-center">
-        <p class="context-pill">Centre de coordination clinique</p>
-        <p class="context-meta">
-          <span>{{ displayDate() }}</span>
-          <i></i>
-          <span>{{ displayTime() }}</span>
-        </p>
-      </div>
-
-      <div class="topbar-user-card">
-        <div class="user-avatar">{{ userInitials() }}</div>
-        <div class="user-meta">
-          <p>{{ currentUser()?.prenom }} {{ currentUser()?.nom }}</p>
-          <span class="user-role">{{ roleLabel() }}</span>
+        <div class="topbar-center">
+          <p class="context-pill">Centre de coordination clinique</p>
+          <p class="context-meta">
+            <span>{{ displayDate() }}</span>
+            <i></i>
+            <span>{{ displayTime() }}</span>
+          </p>
         </div>
-        <button class="btn btn-ghost topbar-logout" type="button" (click)="logout()">Deconnexion</button>
-      </div>
-    </header>
+
+        <div class="topbar-user-card">
+          <div class="user-avatar">{{ userInitials() }}</div>
+          <div class="user-meta">
+            <p>{{ currentUser()?.prenom }} {{ currentUser()?.nom }}</p>
+            <span class="user-role">{{ roleLabel() }}</span>
+          </div>
+          <button class="btn btn-ghost topbar-logout" type="button" (click)="logout()">Deconnexion</button>
+        </div>
+      </header>
+    </div>
 
     <main class="page-container">
       <router-outlet></router-outlet>
