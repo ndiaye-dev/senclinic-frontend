@@ -18,43 +18,63 @@
   @if (showForm()) {
     <section class="card form-card">
       <h3>{{ editingId() ? 'Modifier un patient' : 'Ajouter un patient' }}</h3>
+      @if (submitAttempted() && form.invalid) {
+        <div class="alert error">Veuillez corriger les champs obligatoires marques par *.</div>
+      }
       <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
         <div class="form-grid">
           <div class="field">
-            <label for="numero_dossier">Numero dossier</label>
-            <input id="numero_dossier" formControlName="numero_dossier" />
-            @if (form.controls.numero_dossier.invalid && form.controls.numero_dossier.touched) {
-              <p class="error">Champ obligatoire.</p>
+            <label for="numero_dossier" class="required-label">Numero dossier</label>
+            <input id="numero_dossier" formControlName="numero_dossier" [class.invalid]="isInvalid('numero_dossier')" />
+            @if (isInvalid('numero_dossier')) {
+              <p class="error">{{ getFieldError('numero_dossier') }}</p>
             }
           </div>
 
           <div class="field">
-            <label for="nom">Nom</label>
-            <input id="nom" formControlName="nom" />
+            <label for="nom" class="required-label">Nom</label>
+            <input id="nom" formControlName="nom" [class.invalid]="isInvalid('nom')" />
+            @if (isInvalid('nom')) {
+              <p class="error">{{ getFieldError('nom') }}</p>
+            }
           </div>
 
           <div class="field">
-            <label for="prenom">Prenom</label>
-            <input id="prenom" formControlName="prenom" />
+            <label for="prenom" class="required-label">Prenom</label>
+            <input id="prenom" formControlName="prenom" [class.invalid]="isInvalid('prenom')" />
+            @if (isInvalid('prenom')) {
+              <p class="error">{{ getFieldError('prenom') }}</p>
+            }
           </div>
 
           <div class="field">
-            <label for="date_naissance">Date naissance</label>
-            <input id="date_naissance" type="date" formControlName="date_naissance" />
+            <label for="date_naissance" class="required-label">Date naissance</label>
+            <input
+              id="date_naissance"
+              type="date"
+              formControlName="date_naissance"
+              [class.invalid]="isInvalid('date_naissance')"
+            />
+            @if (isInvalid('date_naissance')) {
+              <p class="error">{{ getFieldError('date_naissance') }}</p>
+            }
           </div>
 
           <div class="field">
-            <label for="sexe">Sexe</label>
-            <select id="sexe" formControlName="sexe">
+            <label for="sexe" class="required-label">Sexe</label>
+            <select id="sexe" formControlName="sexe" [class.invalid]="isInvalid('sexe')">
               <option value="Homme">Homme</option>
               <option value="Femme">Femme</option>
               <option value="Autre">Autre</option>
             </select>
+            @if (isInvalid('sexe')) {
+              <p class="error">{{ getFieldError('sexe') }}</p>
+            }
           </div>
 
           <div class="field">
             <label for="groupe_sanguin">Groupe sanguin</label>
-            <select id="groupe_sanguin" formControlName="groupe_sanguin">
+            <select id="groupe_sanguin" formControlName="groupe_sanguin" [class.invalid]="isInvalid('groupe_sanguin')">
               <option value="O+">O+</option>
               <option value="O-">O-</option>
               <option value="A+">A+</option>
@@ -64,64 +84,109 @@
               <option value="AB+">AB+</option>
               <option value="AB-">AB-</option>
             </select>
+            @if (isInvalid('groupe_sanguin')) {
+              <p class="error">{{ getFieldError('groupe_sanguin') }}</p>
+            }
           </div>
 
           <div class="field">
             <label for="poids">Poids (kg)</label>
-            <input id="poids" type="number" formControlName="poids" />
+            <input id="poids" type="number" formControlName="poids" [class.invalid]="isInvalid('poids')" />
+            @if (isInvalid('poids')) {
+              <p class="error">{{ getFieldError('poids') }}</p>
+            }
           </div>
 
           <div class="field">
-            <label for="telephone">Telephone</label>
-            <input id="telephone" formControlName="telephone" />
+            <label for="telephone" class="required-label">Telephone</label>
+            <input id="telephone" formControlName="telephone" [class.invalid]="isInvalid('telephone')" />
+            @if (isInvalid('telephone')) {
+              <p class="error">{{ getFieldError('telephone') }}</p>
+            }
           </div>
 
           <div class="field">
             <label for="adresse">Adresse</label>
-            <input id="adresse" formControlName="adresse" />
+            <input id="adresse" formControlName="adresse" [class.invalid]="isInvalid('adresse')" />
+            @if (isInvalid('adresse')) {
+              <p class="error">{{ getFieldError('adresse') }}</p>
+            }
           </div>
 
           <div class="field">
             <label for="email">Email</label>
-            <input id="email" formControlName="email" type="email" />
+            <input id="email" formControlName="email" type="email" [class.invalid]="isInvalid('email')" />
+            @if (isInvalid('email')) {
+              <p class="error">{{ getFieldError('email') }}</p>
+            }
           </div>
 
           <div class="field">
             <label for="numero_securite_sociale">Numero securite sociale</label>
-            <input id="numero_securite_sociale" formControlName="numero_securite_sociale" />
+            <input
+              id="numero_securite_sociale"
+              formControlName="numero_securite_sociale"
+              [class.invalid]="isInvalid('numero_securite_sociale')"
+            />
+            @if (isInvalid('numero_securite_sociale')) {
+              <p class="error">{{ getFieldError('numero_securite_sociale') }}</p>
+            }
           </div>
 
           <div class="field">
-            <label for="medecin_traitant">Medecin traitant</label>
-            <select id="medecin_traitant" formControlName="medecin_traitant">
+            <label for="medecin_traitant" class="required-label">Medecin traitant</label>
+            <select id="medecin_traitant" formControlName="medecin_traitant" [class.invalid]="isInvalid('medecin_traitant')">
               @for (medecin of medecins(); track medecin.id) {
                 <option [ngValue]="medecin.id">Dr {{ medecin.prenom }} {{ medecin.nom }}</option>
               }
             </select>
+            @if (isInvalid('medecin_traitant')) {
+              <p class="error">{{ getFieldError('medecin_traitant') }}</p>
+            }
           </div>
 
           <div class="field">
-            <label for="statut">Statut</label>
-            <select id="statut" formControlName="statut">
+            <label for="statut" class="required-label">Statut</label>
+            <select id="statut" formControlName="statut" [class.invalid]="isInvalid('statut')">
               <option value="actif">Actif</option>
               <option value="hospitalise">Hospitalise</option>
               <option value="inactif">Inactif</option>
             </select>
+            @if (isInvalid('statut')) {
+              <p class="error">{{ getFieldError('statut') }}</p>
+            }
           </div>
 
           <div class="field full-width">
             <label for="allergies">Allergies</label>
-            <textarea id="allergies" formControlName="allergies"></textarea>
+            <textarea id="allergies" formControlName="allergies" [class.invalid]="isInvalid('allergies')"></textarea>
+            @if (isInvalid('allergies')) {
+              <p class="error">{{ getFieldError('allergies') }}</p>
+            }
           </div>
 
           <div class="field full-width">
             <label for="antecedents_medicaux">Antecedents medicaux</label>
-            <textarea id="antecedents_medicaux" formControlName="antecedents_medicaux"></textarea>
+            <textarea
+              id="antecedents_medicaux"
+              formControlName="antecedents_medicaux"
+              [class.invalid]="isInvalid('antecedents_medicaux')"
+            ></textarea>
+            @if (isInvalid('antecedents_medicaux')) {
+              <p class="error">{{ getFieldError('antecedents_medicaux') }}</p>
+            }
           </div>
 
           <div class="field full-width">
             <label for="traitements_cours">Traitements en cours</label>
-            <textarea id="traitements_cours" formControlName="traitements_cours"></textarea>
+            <textarea
+              id="traitements_cours"
+              formControlName="traitements_cours"
+              [class.invalid]="isInvalid('traitements_cours')"
+            ></textarea>
+            @if (isInvalid('traitements_cours')) {
+              <p class="error">{{ getFieldError('traitements_cours') }}</p>
+            }
           </div>
         </div>
 

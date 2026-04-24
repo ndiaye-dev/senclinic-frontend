@@ -6,6 +6,19 @@
   margin-bottom: 0.9rem;
 }
 
+.form-card .required-label::after {
+  content: ' *';
+  color: #dc2626;
+  font-weight: 800;
+}
+
+.form-card .field input.invalid,
+.form-card .field select.invalid,
+.form-card .field textarea.invalid {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
+}
+
 .full-width {
   grid-column: 1 / -1;
 }

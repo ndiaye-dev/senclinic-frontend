@@ -28,6 +28,7 @@ export class PatientsPageComponent {
 
   readonly showForm = signal(false);
   readonly editingId = signal<number | null>(null);
+  readonly submitAttempted = signal(false);
 
   readonly searchTerm = signal('');
   readonly sexeFilter = signal<'tous' | Patient['sexe']>('tous');
@@ -41,15 +42,15 @@ export class PatientsPageComponent {
     prenom: ['', [Validators.required, Validators.minLength(2)]],
     date_naissance: ['', Validators.required],
     sexe: ['Homme' as Patient['sexe'], Validators.required],
-    groupe_sanguin: ['O+', Validators.required],
-    poids: [60, [Validators.required, Validators.min(1), Validators.max(300)]],
-    telephone: ['', [Validators.required, Validators.pattern(/^\+?[0-9\s]{9,18}$/)]],
-    adresse: ['', [Validators.required, Validators.minLength(5)]],
-    email: ['', [Validators.required, Validators.email]],
-    numero_securite_sociale: ['', [Validators.required, Validators.minLength(8)]],
-    allergies: ['Aucune', Validators.required],
-    antecedents_medicaux: ['Aucun', Validators.required],
-    traitements_cours: ['Aucun', Validators.required],
+    groupe_sanguin: ['O+'],
+    poids: [60, [Validators.min(1), Validators.max(300)]],
+    telephone: ['', [Validators.required, Validators.pattern(/^\+?[0-9\s-]{9,18}$/)]],
+    adresse: ['', [Validators.minLength(5)]],
+    email: ['', [Validators.email]],
+    numero_securite_sociale: ['', [Validators.minLength(8)]],
+    allergies: ['Aucune'],
+    antecedents_medicaux: ['Aucun'],
+    traitements_cours: ['Aucun'],
     medecin_traitant: [1, [Validators.required, Validators.min(1)]],
     statut: ['actif' as Patient['statut'], Validators.required]
   });
@@ -133,6 +134,7 @@ export class PatientsPageComponent {
   }
 
   openCreateForm(): void {
+    this.submitAttempted.set(false);
     this.editingId.set(null);
     this.form.reset({
       numero_dossier: '',
@@ -156,6 +158,7 @@ export class PatientsPageComponent {
   }
 
   openEditForm(patient: Patient): void {
+    this.submitAttempted.set(false);
     this.editingId.set(patient.id);
     this.form.setValue({
       numero_dossier: patient.numero_dossier,
@@ -179,11 +182,14 @@ export class PatientsPageComponent {
   }
 
   cancelForm(): void {
+    this.submitAttempted.set(false);
     this.showForm.set(false);
     this.editingId.set(null);
   }
 
   submit(): void {
+    this.submitAttempted.set(true);
+
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
@@ -198,6 +204,7 @@ export class PatientsPageComponent {
 
     request$.pipe(finalize(() => this.saving.set(false))).subscribe({
       next: () => {
+        this.submitAttempted.set(false);
         this.cancelForm();
         this.loadData();
       },
@@ -228,5 +235,46 @@ export class PatientsPageComponent {
     }
 
     this.currentPage.set(page);
+  }
+
+  isInvalid(controlName: string): boolean {
+    const control = this.form.get(controlName);
+    return Boolean(control && control.invalid && (control.touched || this.submitAttempted()));
+  }
+
+  getFieldError(controlName: string): string {
+    const control = this.form.get(controlName);
+    const errors = control?.errors;
+
+    if (!errors) {
+      return '';
+    }
+
+    if (errors['required']) {
+      return 'Champ obligatoire.';
+    }
+
+    if (errors['email']) {
+      return 'Format email invalide.';
+    }
+
+    if (errors['pattern']) {
+      return 'Format invalide.';
+    }
+
+    if (errors['minlength']) {
+      const requiredLength = errors['minlength']['requiredLength'];
+      return `Minimum ${requiredLength} caracteres.`;
+    }
+
+    if (errors['min']) {
+      return `Valeur minimale: ${errors['min']['min']}.`;
+    }
+
+    if (errors['max']) {
+      return `Valeur maximale: ${errors['max']['max']}.`;
+    }
+
+    return 'Valeur invalide.';
   }
 }

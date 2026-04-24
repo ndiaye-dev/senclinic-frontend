@@ -7,6 +7,29 @@
     <button class="btn btn-primary" type="button" (click)="openCreateForm()">Nouveau rendez-vous</button>
   </div>
 
+  <section class="rdv-stats">
+    <article class="rdv-stat-card tone-teal">
+      <p>Total rendez-vous</p>
+      <strong>{{ totalRendezVous() }}</strong>
+      <span>Selon les filtres actifs</span>
+    </article>
+    <article class="rdv-stat-card tone-blue">
+      <p>Aujourd'hui</p>
+      <strong>{{ rendezVousAujourdhui() }}</strong>
+      <span>Planifies pour la journee</span>
+    </article>
+    <article class="rdv-stat-card tone-mint">
+      <p>Confirmes / Termines</p>
+      <strong>{{ rendezVousConfirmes() }}</strong>
+      <span>Rendez-vous aboutis</span>
+    </article>
+    <article class="rdv-stat-card highlight tone-indigo">
+      <p>Taux de confirmation</p>
+      <strong>{{ tauxConfirmation() }}%</strong>
+      <span>{{ rendezVousAnnules() }} annules</span>
+    </article>
+  </section>
+
   @if (loading()) {
     <div class="loading-line"></div>
   }
@@ -14,6 +37,40 @@
   @if (errorMessage()) {
     <div class="alert error">{{ errorMessage() }}</div>
   }
+
+  <section class="card view-toolbar">
+    <div class="toolbar">
+      <input
+        class="search"
+        type="search"
+        placeholder="Rechercher par patient, medecin, date ou motif"
+        [value]="searchTerm()"
+        (input)="onSearchChange($any($event.target).value)"
+      />
+      <select [value]="statutFilter()" (change)="onFilterChange($any($event.target).value)">
+        <option value="tous">Tous statuts</option>
+        <option value="planifie">Planifie</option>
+        <option value="confirme">Confirme</option>
+        <option value="termine">Termine</option>
+        <option value="annule">Annule</option>
+      </select>
+      <button class="btn btn-ghost" type="button" (click)="loadData()">Recharger</button>
+    </div>
+
+    <div class="view-mode-toggle">
+      <button
+        class="mode-btn"
+        type="button"
+        [class.active]="viewMode() === 'calendrier'"
+        (click)="setViewMode('calendrier')"
+      >
+        Vue calendrier
+      </button>
+      <button class="mode-btn" type="button" [class.active]="viewMode() === 'liste'" (click)="setViewMode('liste')">
+        Vue liste
+      </button>
+    </div>
+  </section>
 
   @if (showForm()) {
     <section class="card form-card">
@@ -75,75 +132,135 @@
     </section>
   }
 
-  <section class="card">
-    <div class="toolbar">
-      <input
-        class="search"
-        type="search"
-        placeholder="Rechercher par patient, medecin, date ou motif"
-        (input)="onSearchChange($any($event.target).value)"
-      />
-      <select (change)="onFilterChange($any($event.target).value)">
-        <option value="tous">Tous statuts</option>
-        <option value="planifie">Planifie</option>
-        <option value="confirme">Confirme</option>
-        <option value="termine">Termine</option>
-        <option value="annule">Annule</option>
-      </select>
-      <button class="btn btn-ghost" type="button" (click)="loadData()">Recharger</button>
-    </div>
-
-    <div class="table-wrapper">
-      <table>
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Heure</th>
-            <th>Patient</th>
-            <th>Medecin</th>
-            <th>Motif</th>
-            <th>Statut</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          @if (paginatedRendezVous().length === 0) {
-            <tr>
-              <td colspan="7">Aucun rendez-vous trouve.</td>
-            </tr>
-          } @else {
-            @for (item of paginatedRendezVous(); track item.id) {
-              <tr>
-                <td>{{ item.date_rdv }}</td>
-                <td>{{ item.heure_rdv }}</td>
-                <td>{{ getPatientNom(item.patient_id) }}</td>
-                <td>{{ getMedecinNom(item.medecin_id) }}</td>
-                <td>{{ item.motif }}</td>
-                <td>
-                  <span class="status-pill" [class]="'status-pill ' + item.statut">{{ item.statut }}</span>
-                </td>
-                <td>
-                  <div class="actions">
-                    <button class="btn btn-ghost" type="button" (click)="openEditForm(item)">Modifier</button>
-                    <button class="btn btn-danger" type="button" (click)="deleteRendezVous(item.id)">Supprimer</button>
-                  </div>
-                </td>
-              </tr>
-            }
-          }
-        </tbody>
-      </table>
-    </div>
-
-    <div class="pagination">
-      <p>Page {{ currentPage() }} / {{ totalPages() }} ({{ filteredRendezVous().length }} resultats)</p>
-      <div class="pagination-controls">
-        <button type="button" (click)="goToPage(currentPage() - 1)">Precedent</button>
-        @for (page of pageNumbers(); track page) {
-          <button type="button" [class.active]="page === currentPage()" (click)="goToPage(page)">{{ page }}</button>
-        }
-        <button type="button" (click)="goToPage(currentPage() + 1)">Suivant</button>
+  @if (viewMode() === 'calendrier') {
+    <section class="card calendar-card">
+      <div class="calendar-head">
+        <div>
+          <h3>Calendrier des rendez-vous</h3>
+          <p>Vue mensuelle des rendez-vous selon vos filtres en cours.</p>
+        </div>
+        <div class="calendar-nav">
+          <button class="btn btn-ghost" type="button" (click)="previousMonth()">Mois precedent</button>
+          <p>{{ calendarMonthLabel() }}</p>
+          <button class="btn btn-ghost" type="button" (click)="nextMonth()">Mois suivant</button>
+          <button class="btn btn-secondary" type="button" (click)="goToToday()">Aujourd'hui</button>
+        </div>
       </div>
-    </div>
-  </section>
+
+      <div class="calendar-weekdays">
+        @for (label of weekDays; track label) {
+          <span>{{ label }}</span>
+        }
+      </div>
+
+      <div class="calendar-grid">
+        @for (cell of calendarCells(); track cell.iso) {
+          <button
+            class="calendar-day"
+            type="button"
+            [class.out-month]="!cell.inMonth"
+            [class.today]="cell.isToday"
+            [class.selected]="cell.iso === selectedDateIso()"
+            (click)="selectDate(cell.iso)"
+          >
+            <div class="calendar-day-top">
+              <span>{{ cell.day }}</span>
+              @if (cell.items.length > 0) {
+                <small>{{ cell.items.length }}</small>
+              }
+            </div>
+
+            @if (cell.items.length === 0) {
+              <p class="calendar-empty">Libre</p>
+            } @else {
+              <ul class="calendar-snippets">
+                @for (rdv of cell.items.slice(0, 2); track rdv.id) {
+                  <li>{{ rdv.heure_rdv }} - {{ getPatientNom(rdv.patient_id) }}</li>
+                }
+                @if (cell.items.length > 2) {
+                  <li>+{{ cell.items.length - 2 }} autres</li>
+                }
+              </ul>
+            }
+          </button>
+        }
+      </div>
+
+      <div class="calendar-focus">
+        <h4>{{ selectedDateLabel() }}</h4>
+        @if (selectedDayAppointments().length === 0) {
+          <p>Aucun rendez-vous pour cette date.</p>
+        } @else {
+          <div class="focus-list">
+            @for (item of selectedDayAppointments(); track item.id) {
+              <article class="focus-item">
+                <div>
+                  <p><strong>{{ item.heure_rdv }}</strong> - {{ getPatientNom(item.patient_id) }}</p>
+                  <span>Dr {{ getMedecinNom(item.medecin_id).replace('Dr ', '') }} - {{ item.motif }}</span>
+                </div>
+                <span class="status-pill" [class]="'status-pill ' + item.statut">{{ item.statut }}</span>
+              </article>
+            }
+          </div>
+        }
+      </div>
+    </section>
+  }
+
+  @if (viewMode() === 'liste') {
+    <section class="card list-card">
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Heure</th>
+              <th>Patient</th>
+              <th>Medecin</th>
+              <th>Motif</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @if (paginatedRendezVous().length === 0) {
+              <tr>
+                <td colspan="7">Aucun rendez-vous trouve.</td>
+              </tr>
+            } @else {
+              @for (item of paginatedRendezVous(); track item.id) {
+                <tr>
+                  <td>{{ item.date_rdv }}</td>
+                  <td>{{ item.heure_rdv }}</td>
+                  <td>{{ getPatientNom(item.patient_id) }}</td>
+                  <td>{{ getMedecinNom(item.medecin_id) }}</td>
+                  <td>{{ item.motif }}</td>
+                  <td>
+                    <span class="status-pill" [class]="'status-pill ' + item.statut">{{ item.statut }}</span>
+                  </td>
+                  <td>
+                    <div class="actions">
+                      <button class="btn btn-ghost" type="button" (click)="openEditForm(item)">Modifier</button>
+                      <button class="btn btn-danger" type="button" (click)="deleteRendezVous(item.id)">Supprimer</button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination">
+        <p>Page {{ currentPage() }} / {{ totalPages() }} ({{ filteredRendezVous().length }} resultats)</p>
+        <div class="pagination-controls">
+          <button type="button" (click)="goToPage(currentPage() - 1)">Precedent</button>
+          @for (page of pageNumbers(); track page) {
+            <button type="button" [class.active]="page === currentPage()" (click)="goToPage(page)">{{ page }}</button>
+          }
+          <button type="button" (click)="goToPage(currentPage() + 1)">Suivant</button>
+        </div>
+      </div>
+    </section>
+  }
 </section>

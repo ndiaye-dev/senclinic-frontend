@@ -9,6 +9,14 @@ import { MedecinsService } from '../../../core/services/medecins.service';
 import { PatientsService } from '../../../core/services/patients.service';
 import { RendezVousService } from '../../../core/services/rendez-vous.service';
 
+interface CalendarCell {
+  iso: string;
+  day: number;
+  inMonth: boolean;
+  isToday: boolean;
+  items: RendezVous[];
+}
+
 @Component({
   selector: 'app-rendez-vous-page',
   standalone: true,
@@ -32,11 +40,15 @@ export class RendezVousPageComponent {
 
   readonly showForm = signal(false);
   readonly editingId = signal<number | null>(null);
+  readonly viewMode = signal<'calendrier' | 'liste'>('calendrier');
 
   readonly searchTerm = signal('');
   readonly statutFilter = signal<'tous' | RendezVous['statut']>('tous');
   readonly currentPage = signal(1);
   readonly pageSize = 6;
+  readonly weekDays = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'] as const;
+  readonly currentMonth = signal(this.toMonthStart(new Date()));
+  readonly selectedDateIso = signal(this.formatDateIso(new Date()));
 
   readonly form = this.fb.group({
     patient_id: [1, [Validators.required, Validators.min(1)]],
@@ -71,6 +83,76 @@ export class RendezVousPageComponent {
     const start = (this.currentPage() - 1) * this.pageSize;
     return this.filteredRendezVous().slice(start, start + this.pageSize);
   });
+  readonly totalRendezVous = computed(() => this.filteredRendezVous().length);
+  readonly rendezVousAujourdhui = computed(() => {
+    const today = this.formatDateIso(new Date());
+    return this.filteredRendezVous().filter((item) => item.date_rdv === today).length;
+  });
+  readonly rendezVousConfirmes = computed(
+    () => this.filteredRendezVous().filter((item) => item.statut === 'confirme' || item.statut === 'termine').length
+  );
+  readonly rendezVousAnnules = computed(() => this.filteredRendezVous().filter((item) => item.statut === 'annule').length);
+  readonly tauxConfirmation = computed(() => {
+    const total = this.totalRendezVous();
+    if (total === 0) {
+      return 0;
+    }
+
+    return Math.round((this.rendezVousConfirmes() / total) * 100);
+  });
+  readonly rendezVousByDate = computed(() => {
+    const map = new Map<string, RendezVous[]>();
+
+    for (const item of this.filteredRendezVous()) {
+      const row = map.get(item.date_rdv) ?? [];
+      row.push(item);
+      map.set(item.date_rdv, row);
+    }
+
+    for (const list of map.values()) {
+      list.sort((a, b) => a.heure_rdv.localeCompare(b.heure_rdv));
+    }
+
+    return map;
+  });
+  readonly calendarMonthLabel = computed(() =>
+    new Intl.DateTimeFormat('fr-FR', { month: 'long', year: 'numeric' }).format(this.currentMonth())
+  );
+  readonly calendarCells = computed<CalendarCell[]>(() => {
+    const month = this.currentMonth();
+    const firstDay = new Date(month.getFullYear(), month.getMonth(), 1);
+    const daysInMonth = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
+    const offset = (firstDay.getDay() + 6) % 7;
+    const totalCells = Math.ceil((offset + daysInMonth) / 7) * 7;
+    const startDate = new Date(month.getFullYear(), month.getMonth(), 1 - offset);
+    const todayIso = this.formatDateIso(new Date());
+    const rows: CalendarCell[] = [];
+    const byDate = this.rendezVousByDate();
+
+    for (let index = 0; index < totalCells; index += 1) {
+      const cursor = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate() + index);
+      const iso = this.formatDateIso(cursor);
+
+      rows.push({
+        iso,
+        day: cursor.getDate(),
+        inMonth: cursor.getMonth() === month.getMonth(),
+        isToday: iso === todayIso,
+        items: byDate.get(iso) ?? []
+      });
+    }
+
+    return rows;
+  });
+  readonly selectedDayAppointments = computed(() => this.rendezVousByDate().get(this.selectedDateIso()) ?? []);
+  readonly selectedDateLabel = computed(() =>
+    new Intl.DateTimeFormat('fr-FR', {
+      weekday: 'long',
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
+    }).format(this.parseDateIso(this.selectedDateIso()))
+  );
 
   constructor() {
     effect(() => {
@@ -202,5 +284,49 @@ export class RendezVousPageComponent {
     }
 
     this.currentPage.set(page);
+  }
+
+  setViewMode(mode: 'calendrier' | 'liste'): void {
+    this.viewMode.set(mode);
+  }
+
+  previousMonth(): void {
+    const month = this.currentMonth();
+    const previous = new Date(month.getFullYear(), month.getMonth() - 1, 1);
+    this.currentMonth.set(previous);
+    this.selectedDateIso.set(this.formatDateIso(previous));
+  }
+
+  nextMonth(): void {
+    const month = this.currentMonth();
+    const next = new Date(month.getFullYear(), month.getMonth() + 1, 1);
+    this.currentMonth.set(next);
+    this.selectedDateIso.set(this.formatDateIso(next));
+  }
+
+  goToToday(): void {
+    const today = new Date();
+    this.currentMonth.set(this.toMonthStart(today));
+    this.selectedDateIso.set(this.formatDateIso(today));
+  }
+
+  selectDate(iso: string): void {
+    this.selectedDateIso.set(iso);
+  }
+
+  private toMonthStart(date: Date): Date {
+    return new Date(date.getFullYear(), date.getMonth(), 1);
+  }
+
+  private formatDateIso(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  private parseDateIso(iso: string): Date {
+    const [year, month, day] = iso.split('-').map((part) => Number(part));
+    return new Date(year, (month || 1) - 1, day || 1);
   }
 }

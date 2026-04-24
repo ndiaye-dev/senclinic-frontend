@@ -1,37 +1,76 @@
 .stat-card {
+  --accent: var(--primary-color);
+  --accent-strong: #0b5f58;
+  --accent-soft: rgba(15, 118, 110, 0.14);
+  --accent-border: rgba(15, 118, 110, 0.26);
+  --accent-alt: #1d4ed8;
   position: relative;
   overflow: hidden;
   border-radius: 18px;
-  border: 1px solid var(--border-color);
-  background: linear-gradient(180deg, #fff 0%, #f8fafc 100%);
+  border: 1px solid #d8e4f2;
+  background:
+    radial-gradient(circle at 100% -26%, var(--accent-soft), transparent 52%),
+    linear-gradient(165deg, #ffffff 0%, #f8fbff 52%, #f3f8ff 100%);
   padding: 1rem 1.1rem;
-  box-shadow: var(--shadow-soft);
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.09);
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease,
+    border-color 0.22s ease;
 }
 
-.stat-card.teal {
-  border-top: 4px solid var(--primary-color);
-}
-
-.stat-card.blue {
-  border-top: 4px solid var(--secondary-color);
-}
-
-.stat-card.gray {
-  border-top: 4px solid #94a3b8;
+.stat-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-alt));
 }
 
 .stat-card::after {
   content: '';
   position: absolute;
-  right: -35px;
-  top: -35px;
-  width: 95px;
-  height: 95px;
+  right: -28px;
+  top: -28px;
+  width: 112px;
+  height: 112px;
   border-radius: 50%;
-  background: rgba(15, 23, 42, 0.04);
+  background: radial-gradient(circle, var(--accent-soft) 0%, rgba(15, 23, 42, 0) 72%);
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent-border);
+  box-shadow: 0 24px 44px rgba(15, 23, 42, 0.14);
+}
+
+.stat-card.teal {
+  --accent: #0f766e;
+  --accent-strong: #0b5f58;
+  --accent-soft: rgba(15, 118, 110, 0.17);
+  --accent-border: rgba(15, 118, 110, 0.3);
+  --accent-alt: #0ea5a0;
+}
+
+.stat-card.blue {
+  --accent: #1d4ed8;
+  --accent-strong: #1e40af;
+  --accent-soft: rgba(29, 78, 216, 0.16);
+  --accent-border: rgba(29, 78, 216, 0.28);
+  --accent-alt: #3b82f6;
+}
+
+.stat-card.gray {
+  --accent: #475569;
+  --accent-strong: #334155;
+  --accent-soft: rgba(71, 85, 105, 0.15);
+  --accent-border: rgba(71, 85, 105, 0.24);
+  --accent-alt: #64748b;
 }
 
 .stat-head {
+  position: relative;
+  z-index: 1;
   display: flex;
   justify-content: space-between;
   gap: 0.5rem;
@@ -40,51 +79,63 @@
 
 .stat-title {
   margin: 0;
-  color: var(--muted-text);
-  font-size: 0.88rem;
-  font-weight: 600;
+  color: #334155;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
 }
 
 .stat-chip {
   border-radius: 999px;
   font-size: 0.72rem;
-  font-weight: 700;
-  padding: 0.18rem 0.5rem;
-  background: #e2e8f0;
-  color: #334155;
+  font-weight: 800;
+  padding: 0.18rem 0.52rem;
+  border: 1px solid var(--accent-border);
+  background: rgba(255, 255, 255, 0.74);
+  color: var(--accent-strong);
 }
 
 .stat-value {
-  margin: 0.42rem 0 0.35rem;
-  color: var(--text-color);
-  font-size: 1.82rem;
+  position: relative;
+  z-index: 1;
+  margin: 0.48rem 0 0.32rem;
+  color: #0f172a;
+  font-size: 2rem;
   line-height: 1;
   font-weight: 800;
+  letter-spacing: -0.02em;
 }
 
 .stat-description {
+  position: relative;
+  z-index: 1;
   margin: 0;
-  color: var(--muted-text);
-  font-size: 0.85rem;
+  color: #475569;
+  font-size: 0.84rem;
 }
 
 .stat-trend {
-  margin: 0.45rem 0 0;
+  position: relative;
+  z-index: 1;
+  margin: 0.44rem 0 0;
   font-size: 0.8rem;
-  color: #0f766e;
+  color: var(--accent-strong);
   font-weight: 700;
 }
 
 .progress-track {
-  margin-top: 0.52rem;
-  height: 7px;
+  position: relative;
+  z-index: 1;
+  margin-top: 0.54rem;
+  height: 8px;
   border-radius: 999px;
-  background: #e2e8f0;
+  background: #dbe4f0;
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.12);
   overflow: hidden;
 }
 
 .progress-fill {
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  background: linear-gradient(90deg, var(--accent), var(--accent-alt));
 }
